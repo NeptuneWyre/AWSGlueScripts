@@ -1,0 +1,65 @@
+import sys
+import time;
+import datetime;
+from pyspark.sql.functions import lit
+from pyspark.sql.types import * 
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.job import Job
+
+## @params: [TempDir, JOB_NAME]
+args = getResolvedOptions(sys.argv, ['TempDir','JOB_NAME'])
+
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+
+ct = datetime.datetime.now()
+inserttimestamp = ct
+
+## @type: DataSource
+## @args: [database = "wyre_prod_analytics", table_name = "wyre_prod_core_view_wallet_order_reports", transformation_ctx = "DataSource0"]
+## @return: DataSource0
+## @inputs: []
+DataSource0 = glueContext.create_dynamic_frame.from_catalog(database = "wyre_prod_analytics", table_name = "wyre_prod_core_wallet_order", transformation_ctx = "DataSource0")
+datasource1 = DataSource0.toDF().withColumn("inserttimestamp", lit(inserttimestamp))
+
+## Convert DataFrame back to DynamicFrame
+datasource2 = DataSource0.fromDF(datasource1, glueContext, "datasource2")
+
+## @type: ApplyMapping
+## @args: [mappings = [("ordertype", "string", "ordertype", "string"), ("dest", "string", "dest", "string"), ("ssn", "string", "ssn", "string"), ("createdat", "timestamp", "createdat", "timestamp"), ("usdsourceamount", "decimal", "usdsourceamount", "decimal"), ("destcurrency", "string", "destcurrency", "string"), ("usdrate", "decimal", "usdrate", "decimal"), ("context", "string", "context", "string"), ("awaitingdob", "string", "awaitingdob", "string"), ("reservation", "string", "reservation", "string"), ("id", "string", "id", "string"), ("microchargerequest", "string", "microchargerequest", "string"), ("secondpaymentrequest", "string", "secondpaymentrequest", "string"), ("microchargepaymentid", "string", "microchargepaymentid", "string"), ("usdpurchaseamount", "decimal", "usdpurchaseamount", "decimal"), ("cardinfo", "string", "cardinfo", "string"), ("smsdeliveredat", "timestamp", "smsdeliveredat", "timestamp"), ("referrerid", "string", "referrerid", "string"), ("phone", "string", "phone", "string"), ("dob", "string", "dob", "string"), ("failurereason", "string", "failurereason", "string"), ("paymentabusescore", "decimal", "paymentabusescore", "decimal"), ("status", "string", "status", "string"), ("paymentabusescorereason", "string", "paymentabusescorereason", "string"), ("smstriggerat", "timestamp", "smstriggerat", "timestamp"), ("request", "string", "request", "string"), ("referreraccountid", "string", "referreraccountid", "string"), ("wallettype", "string", "wallettype", "string"), ("extras", "string", "extras", "string"), ("sourcecurrency", "string", "sourcecurrency", "string"), ("smssentat", "timestamp", "smssentat", "timestamp"), ("microchargeresponse", "string", "microchargeresponse", "string"), ("referenceid", "string", "referenceid", "string"), ("paymentnetworkerrorcode", "string", "paymentnetworkerrorcode", "string"), ("paymentmethodid", "string", "paymentmethodid", "string"), ("countrycode", "string", "countrycode", "string"), ("sourceamount", "decimal", "sourceamount", "decimal"), ("smsrepliedat", "timestamp", "smsrepliedat", "timestamp"), ("refunded", "string", "refunded", "string"), ("secondrequest", "string", "secondrequest", "string"), ("authcodesrequested", "string", "authcodesrequested", "string"), ("email", "string", "email", "string"), ("owner", "string", "owner", "string"), ("ordercreationresponse", "string", "ordercreationresponse", "string"), ("secondpaymentresponse", "string", "secondpaymentresponse", "string"), ("smsreplybody", "string", "smsreplybody", "string"), ("ordercreationrequest", "string", "ordercreationrequest", "string"), ("billingidentifier", "string", "billingidentifier", "string"), ("transferid", "string", "transferid", "string"), ("purchaseamount", "decimal", "purchaseamount", "decimal"), ("awaitingssn", "char", "awaitingssn", "char"), ("refundmessage", "string", "refundmessage", "string"), ("paymentprovider", "string", "paymentprovider", "string"), ("billingaddress", "string", "billingaddress", "string"), ("paymentproviderid", "string", "paymentproviderid", "string"), ("internalerrorcode", "string", "internalerrorcode", "string")], transformation_ctx = "Transform0"]
+## @return: Transform0
+## @inputs: [frame = DataSource0]
+Transform0 = ApplyMapping.apply(frame = datasource2, mappings = [("inserttimestamp", "timestamp", "inserttimestamp", "timestamp"), ("ordertype", "string", "ordertype", "string"), ("dest", "string", "dest", "string"), ("createdat", "timestamp", "createdat", "timestamp"), ("usdsourceamount", "decimal", "usdsourceamount", "decimal"), ("destcurrency", "string", "destcurrency", "string"), ("usdrate", "decimal", "usdrate", "decimal"), ("reservation", "string", "reservation", "string"), ("id", "string", "id", "string"), ("usdpurchaseamount", "decimal", "usdpurchaseamount", "decimal"), ("cardinfo", "string", "cardinfo", "string"), ("referrerid", "string", "referrerid", "string"), ("phone", "string", "phone", "string"), ("failurereason", "string", "failurereason", "string"), ("paymentabusescore", "decimal", "paymentabusescore", "decimal"), ("status", "string", "status", "string"), ("paymentabusescorereason", "string", "paymentabusescorereason", "string"), ("referreraccountid", "string", "referreraccountid", "string"), ("wallettype", "string", "wallettype", "string"), ("extras", "string", "extras", "string"), ("sourcecurrency", "string", "sourcecurrency", "string"), ("referenceid", "string", "referenceid", "string"), ("paymentnetworkerrorcode", "string", "paymentnetworkerrorcode", "string"), ("sourceamount", "decimal", "sourceamount", "decimal"), ("authcodesrequested", "string", "authcodesrequested", "string"), ("email", "string", "email", "string"), ("owner", "string", "owner", "string"), ("billingidentifier", "string", "billingidentifier", "string"), ("transferid", "string", "transferid", "string"), ("purchaseamount", "decimal", "purchaseamount", "decimal"), ("paymentprovider", "string", "paymentprovider", "string"), ("billingaddress", "string", "billingaddress", "string"), ("paymentproviderid", "string", "paymentproviderid", "string"), ("internalerrorcode", "string", "internalerrorcode", "string")], transformation_ctx = "Transform0")
+## @type: DataSink
+## @args: [database = "wyrereportcore", additionalOptions = {"aws_iam_role":"arn:aws:iam::640665071543:role/AWSGlueRole"}, redshift_tmp_dir = TempDir, table_name = "wyre_report_core_public_wallet_order", transformation_ctx = "DataSink0"]
+## @return: DataSink0
+## @inputs: [frame = Transform0]
+DataSink0 = glueContext.write_dynamic_frame.from_catalog(frame = Transform0, database = "wyrereportcore", redshift_tmp_dir = args["TempDir"], table_name = "wyre_report_core_public_wallet_order", transformation_ctx = "DataSink0")
+job.commit()
+
+##deleting prior records to remove duplicate from table
+from py4j.java_gateway import java_import
+java_import(sc._gateway.jvm,"java.sql.Connection")
+java_import(sc._gateway.jvm,"java.sql.DatabaseMetaData")
+java_import(sc._gateway.jvm,"java.sql.DriverManager")
+java_import(sc._gateway.jvm,"java.sql.SQLException")
+
+conn = sc._gateway.jvm.DriverManager.getConnection('jdbc:redshift://redshiftwyreanalyticscluster-2.coiym9xo2w3p.us-west-2.redshift.amazonaws.com:5439/wyre_report_core', 'wyreadminuser', 'ZWdgP5210#!?{%}&^r')
+
+print(conn.getMetaData().getDatabaseProductName())
+
+# call stored procedure
+stmt = conn.createStatement();
+
+try:
+  rs = stmt.executeQuery('call public.delete_duplicate_wallet_order()');
+except:
+  print("An exception occurred but proc has run")
+
+conn.close()    
